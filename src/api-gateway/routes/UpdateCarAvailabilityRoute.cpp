@@ -7,23 +7,20 @@
 #include "clients.h"
 #include "dto/CarAvailabilityDTO.h"
 
-void UpdateCarAvailabilityRoute::Init(const IRequestHandlerContextPtr &context,
-                                      const std::map<std::string, size_t> clients)
+void UpdateCarAvailabilityRoute::Init(const IRequestHandlerContextPtr &context)
 {
     m_context = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     if (!m_context)
         throw ContextPtrCastException("update car route");
-
-    m_clientsIndexes = clients;
 }
 
 void UpdateCarAvailabilityRoute::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void UpdateCarAvailabilityRoute::ProcessRequest(const IRequestPtr &request, size_t &clientIndex)
+void UpdateCarAvailabilityRoute::ProcessRequest(const IRequestPtr &request, std::string &clientName)
 {
-    clientIndex = m_clientsIndexes[CARS_CLIENT];
+    clientName = CARS_CLIENT;
 
     std::string carUid;
     bool available = false;

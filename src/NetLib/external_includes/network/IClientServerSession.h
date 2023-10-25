@@ -2,14 +2,13 @@
 
 #include <memory>
 
-#include <network/net_asio.h>
+#include <network/IClientServerConnection.h>
 
 class IClientServerSession
 {
 public:
     virtual ~IClientServerSession() = default;
-    virtual std::future<void> Run(tcp::socket server_sock,
-                                  const std::vector<std::shared_ptr<tcp::socket>> &clients_sock) = 0;
+    virtual std::future<void> Run(tcp::socket server_sock, const IClientServerConnectionPtr &connection) = 0;
 };
 
 using IClientServerSessionPtr = std::shared_ptr<IClientServerSession>;

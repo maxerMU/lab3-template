@@ -5,22 +5,20 @@
 
 #include "clients.h"
 
-void GetRentRoute::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t> clients)
+void GetRentRoute::Init(const IRequestHandlerContextPtr &context)
 {
     m_context = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     if (!m_context)
         throw ContextPtrCastException("get rent route");
-
-    m_clientsIndexes = clients;
 }
 
 void GetRentRoute::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void GetRentRoute::ProcessRequest(const IRequestPtr &request, size_t &clientIndex)
+void GetRentRoute::ProcessRequest(const IRequestPtr &request, std::string &clientName)
 {
-    clientIndex = m_clientsIndexes[RENTS_CLIENT];
+    clientName = RENTS_CLIENT;
 
     std::string rentUid;
     if (m_context->GetRequestType() == ApiGatewayContext::GetRent)

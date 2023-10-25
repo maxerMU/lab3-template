@@ -8,9 +8,9 @@ class IClientServerRoute
 public:
     virtual ~IClientServerRoute() = default;
 
-    virtual void Init(const IRequestHandlerContextPtr& context, const std::map<std::string, size_t> clients) = 0;
+    virtual void Init(const IRequestHandlerContextPtr& context) = 0;
     virtual void SetRequestParameters(const std::vector<std::string>& params) = 0;
-    virtual void ProcessRequest(const IRequestPtr& request, size_t& clientIndex) = 0;
+    virtual void ProcessRequest(const IRequestPtr& request, std::string& clientName) = 0;
 
     enum ResponceType
     {

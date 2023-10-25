@@ -3,10 +3,9 @@
 #include "clients.h"
 #include <logger/LoggerFactory.h>
 
-void GetCarsRoute::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t> clients)
+void GetCarsRoute::Init(const IRequestHandlerContextPtr &context)
 {
     m_context = context;
-    m_clientsIndexes = clients;
 }
 
 void GetCarsRoute::SetRequestParameters(const std::vector<std::string> &params)
@@ -15,9 +14,9 @@ void GetCarsRoute::SetRequestParameters(const std::vector<std::string> &params)
         LoggerFactory::GetLogger()->LogError("get cars incorrect params count");
 }
 
-void GetCarsRoute::ProcessRequest(const IRequestPtr &request, size_t &clientIndex)
+void GetCarsRoute::ProcessRequest(const IRequestPtr &request, std::string &clientName)
 {
-    clientIndex = m_clientsIndexes[CARS_CLIENT];
+    clientName = CARS_CLIENT;
     request->copy(m_context->GetCurrentRequest());
 }
 

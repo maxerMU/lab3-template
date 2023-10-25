@@ -5,7 +5,7 @@
 #include "context/ApiGatewayContext.h"
 #include "dto/GetRentDTO.h"
 
-void GetRentsPost::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t>)
+void GetRentsPost::Init(const IRequestHandlerContextPtr &context)
 {
     ApiGatewayContextPtr apiGatewayContext = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     ApiGatewayContext::RequestProcessInfo::GetRentsRequest rents = apiGatewayContext->GetProcessInfo().getRentsRequest;
@@ -18,17 +18,12 @@ void GetRentsPost::Init(const IRequestHandlerContextPtr &context, const std::map
             rents.rents[i].status,
             rents.rents[i].dateFrom,
             rents.rents[i].dateTo,
+            {rents.cars[i].carUid, rents.cars[i].brand, rents.cars[i].model, rents.cars[i].registrationNumber},
             {
-                rents.cars[i].carUid,
-                rents.cars[i].brand,
-                rents.cars[i].model,
-                rents.cars[i].registrationNumber
-            },
-            {
-                rents.payments[i].paymentUid,
-                rents.payments[i].status,
-                rents.payments[i].price,
-            }
+                              rents.payments[i].paymentUid,
+                              rents.payments[i].status,
+                              rents.payments[i].price,
+                              }
         };
 
         getRentsDTO.push_back(getRentDto);
@@ -42,7 +37,7 @@ void GetRentsPost::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void GetRentsPost::ProcessRequest(const IRequestPtr &, size_t &)
+void GetRentsPost::ProcessRequest(const IRequestPtr &, std::string &)
 {
     LoggerFactory::GetLogger()->LogError("GetRentPost::ProcessRequest unexpected call");
 }

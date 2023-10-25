@@ -2,30 +2,28 @@
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 
-#include <exceptions/server_exceptions.h>
 #include <exceptions/logic_exceptions.h>
+#include <exceptions/server_exceptions.h>
 #include <logger/LoggerFactory.h>
 
 #include "dto/PostRentDTO.h"
 
 #include "clients.h"
 
-void PostRentRoute::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t> clients)
+void PostRentRoute::Init(const IRequestHandlerContextPtr &context)
 {
     m_context = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     if (!m_context)
         throw ContextPtrCastException("post rent route");
-
-    m_clientsIndexes = clients;
 }
 
 void PostRentRoute::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void PostRentRoute::ProcessRequest(const IRequestPtr &request, size_t &clientIndex)
+void PostRentRoute::ProcessRequest(const IRequestPtr &request, std::string &clientName)
 {
-    clientIndex = m_clientsIndexes[RENTS_CLIENT];
+    clientName = RENTS_CLIENT;
 
     std::string paymentUid, carUid, dateFrom, dateTo;
     if (m_context->GetRequestType() == ApiGatewayContext::PostRent)

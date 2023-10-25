@@ -52,7 +52,8 @@ target_sources( ${PROJECT_NAME} PRIVATE
     external_includes/router/router.h
     external_includes/network/net.h
     external_includes/network/net_asio.h
-    external_includes/network/IConnection.h
+    external_includes/network/IServerConnection.h
+    external_includes/network/IClientServerConnection.h
     external_includes/network/IServerSession.h
     external_includes/network/IClientServerSession.h
 )

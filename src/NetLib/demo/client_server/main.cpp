@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     LoggerFactory::InitLogger(config);
 
     auto handlerCreator = std::make_shared<ClientServerReqHandlerCreator<DummyClientServerHandler>>(config);
-    auto sessionCreator = CreateClientServerSessionCreator(handlerCreator);
+    auto sessionCreator = CreateClientServerSessionCreator(handlerCreator, config);
     auto connection = CreateClientServerConnection(ioc, sessionCreator, config);
 
     connection->Run();

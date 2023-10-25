@@ -1,9 +1,9 @@
 #include "PostRentPrep.h"
 
-#include <logger/LoggerFactory.h>
 #include "context/ApiGatewayContext.h"
+#include <logger/LoggerFactory.h>
 
-void PostRentPrep::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t>)
+void PostRentPrep::Init(const IRequestHandlerContextPtr &context)
 {
     ApiGatewayContextPtr apiGatewayContext = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     apiGatewayContext->SetRequestType(ApiGatewayContext::PostRent);
@@ -14,7 +14,7 @@ void PostRentPrep::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void PostRentPrep::ProcessRequest(const IRequestPtr &, size_t &)
+void PostRentPrep::ProcessRequest(const IRequestPtr &, std::string &)
 {
     LoggerFactory::GetLogger()->LogError("GetRentPrep::ProcessRequest unexpected call");
 }

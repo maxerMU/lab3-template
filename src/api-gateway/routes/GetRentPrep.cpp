@@ -1,9 +1,9 @@
 #include "GetRentPrep.h"
 
-#include <logger/LoggerFactory.h>
 #include "context/ApiGatewayContext.h"
+#include <logger/LoggerFactory.h>
 
-void GetRentPrep::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t>)
+void GetRentPrep::Init(const IRequestHandlerContextPtr &context)
 {
     ApiGatewayContextPtr apiGatewayContext = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     apiGatewayContext->SetRequestType(ApiGatewayContext::GetRent);
@@ -14,11 +14,11 @@ void GetRentPrep::SetRequestParameters(const std::vector<std::string> &params)
 {
     if (params.size() != 1)
         LoggerFactory::GetLogger()->LogError("get rent prep incorrect params");
-    
+
     m_rentUid = params[0];
 }
 
-void GetRentPrep::ProcessRequest(const IRequestPtr &, size_t &)
+void GetRentPrep::ProcessRequest(const IRequestPtr &, std::string &)
 {
     LoggerFactory::GetLogger()->LogError("GetRentPrep::ProcessRequest unexpected call");
 }

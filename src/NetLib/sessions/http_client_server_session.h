@@ -7,28 +7,29 @@
 class HttpClientServerSession : public IClientServerSession
 {
 public:
-    HttpClientServerSession(const std::shared_ptr<IClientServerReqHandlerCreator> &creator);
+    HttpClientServerSession(const IClientServerReqHandlerCreatorPtr &creator, const IConfigPtr& config);
 
-    virtual std::future<void> Run(tcp::socket server_sock,
-                                  const std::vector<std::shared_ptr<tcp::socket>> &clients_sock) override;
+    virtual std::future<void> Run(tcp::socket server_sock, const IClientServerConnectionPtr &connection) override;
 
 private:
-    std::shared_ptr<IClientServerReqHandlerCreator> m_handlerCreator;
+    IClientServerReqHandlerCreatorPtr m_handlerCreator;
+    IConfigPtr m_config;
 };
 
 class HttpClientServerSessionCreator : public IClientServerSessionCreator
 {
 public:
-    HttpClientServerSessionCreator(const std::shared_ptr<IClientServerReqHandlerCreator> &creator);
+    HttpClientServerSessionCreator(const IClientServerReqHandlerCreatorPtr &creator, const IConfigPtr& config);
     virtual ~HttpClientServerSessionCreator() = default;
 
     std::shared_ptr<IClientServerSession> CreateSession() override
     {
-        return std::shared_ptr<IClientServerSession>(new HttpClientServerSession(m_creator));
+        return std::shared_ptr<IClientServerSession>(new HttpClientServerSession(m_creator, m_config));
     }
 
 private:
-    std::shared_ptr<IClientServerReqHandlerCreator> m_creator;
+    IClientServerReqHandlerCreatorPtr m_creator;
+    IConfigPtr m_config;
 };
 
 #endif // HTTPCLIENTSERVERSESSION_H

@@ -1,9 +1,9 @@
 #include "HealthRoute.h"
 
-#include <logger/LoggerFactory.h>
 #include "context/ApiGatewayContext.h"
+#include <logger/LoggerFactory.h>
 
-void HealthRoute::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t>)
+void HealthRoute::Init(const IRequestHandlerContextPtr &context)
 {
     context->GetCurrentResponse()->SetStatus(net::CODE_200);
 }
@@ -12,7 +12,7 @@ void HealthRoute::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void HealthRoute::ProcessRequest(const IRequestPtr &, size_t &)
+void HealthRoute::ProcessRequest(const IRequestPtr &, std::string &)
 {
     LoggerFactory::GetLogger()->LogError("GetRentPrep::ProcessRequest unexpected call");
 }

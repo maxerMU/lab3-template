@@ -22,20 +22,9 @@ public:
 
     virtual ~IClientServerReqHandler() = default;
     virtual state_t HandleRequest(const std::shared_ptr<IRequest> &req) = 0;
-    virtual state_t GetNextRequest(std::shared_ptr<IRequest> &req, size_t &client_index) = 0;
+    virtual state_t GetNextRequest(std::shared_ptr<IRequest> &req, std::string &clientName) = 0;
     virtual state_t HandleResponse(const std::shared_ptr<IResponse> &resp) = 0;
     virtual void MakeResponse(const std::shared_ptr<IResponse> &resp) = 0;
-
-protected:
-    std::map<std::string, size_t> m_clientIndexes;
-    void SetClientIndexes(const std::shared_ptr<IConfig> &config)
-    {
-        m_clientIndexes.clear();
-        std::vector<std::string> clients = config->GetStringArray({ClientsSection});
-
-        for (size_t i = 0; i < clients.size(); i++)
-            m_clientIndexes[clients[i]] = i;
-    }
 };
 
 using IClientServerReqHandlerPtr = std::shared_ptr<IClientServerReqHandler>;

@@ -5,22 +5,20 @@
 
 #include "clients.h"
 
-void FinishRentRoute::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t> clients)
+void FinishRentRoute::Init(const IRequestHandlerContextPtr &context)
 {
     m_context = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     if (!m_context)
         throw ContextPtrCastException("finish rent route");
-
-    m_clientsIndexes = clients;
 }
 
 void FinishRentRoute::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void FinishRentRoute::ProcessRequest(const IRequestPtr &request, size_t &clientIndex)
+void FinishRentRoute::ProcessRequest(const IRequestPtr &request, std::string &clientName)
 {
-    clientIndex = m_clientsIndexes[RENTS_CLIENT];
+    clientName = RENTS_CLIENT;
 
     std::string rentUid;
     if (m_context->GetRequestType() == ApiGatewayContext::FinishRent)

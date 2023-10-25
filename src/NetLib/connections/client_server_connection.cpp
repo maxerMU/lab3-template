@@ -13,36 +13,35 @@ ClientServerConnection::ClientServerConnection(asio::io_context &context,
                                                const std::shared_ptr<IConfig> &config)
     : m_sessionCreator(creator), m_acceptor(context), m_context(context), m_config(config)
 {
-    m_clientSockets = ConnetClientSockets(m_config);
     ConnectServerSocket(config);
 }
 
-std::vector<std::shared_ptr<tcp::socket>> ClientServerConnection::ConnetClientSockets(
-    const std::shared_ptr<IConfig> &config)
+std::shared_ptr<tcp::socket> ClientServerConnection::ConnetClientSocket(const std::string &clientName)
 {
-    std::vector<std::shared_ptr<tcp::socket>> client_sockets;
-    std::vector<std::string> clients = config->GetStringArray({ClientsSection});
+    std::shared_ptr<tcp::socket> clientSocket;
+    std::vector<std::string> clients = m_config->GetStringArray({ClientsSection});
 
-    for (auto client : clients)
-    {
-        std::ostringstream oss;
-        oss << "Connecting to " << client << "...";
-        LoggerFactory::GetLogger()->LogInfo(oss.str().c_str());
+    auto clientIt = std::find(clients.begin(), clients.end(), clientName);
+    if (clientIt == clients.end())
+        throw ClientNotFoundException(clientName);
 
-        std::string host = config->GetStringField({client, ClientHostSection});
-        int port = config->GetIntField({client, ClientPortSection});
-        asio::ip::tcp::resolver resolver(m_context);
-        auto results = resolver.resolve(host, std::to_string(port));
-        // tcp::endpoint ep(asio::ip::address::from_string(host), port);
+    std::ostringstream oss;
+    oss << "Connecting to " << clientName << "...";
+    LoggerFactory::GetLogger()->LogInfo(oss.str().c_str());
 
-        std::shared_ptr<tcp::socket> client_sock(new tcp::socket(m_context));
-        asio::connect(*client_sock, results.begin(), results.end());
+    std::string host = m_config->GetStringField({clientName, ClientHostSection});
+    int port = m_config->GetIntField({clientName, ClientPortSection});
+    asio::ip::tcp::resolver resolver(m_context);
+    auto results = resolver.resolve(host, std::to_string(port));
 
-        client_sockets.push_back(client_sock);
-        LoggerFactory::GetLogger()->LogInfo("Connected");
-    }
+    std::shared_ptr<tcp::socket> clientSock(new tcp::socket(m_context));
+    asio::connect(*clientSock, results.begin(), results.end());
 
-    return client_sockets;
+    oss.clear();
+    oss << "Connected to " << clientName;
+    LoggerFactory::GetLogger()->LogInfo(oss.str().c_str());
+
+    return clientSock;
 }
 
 void ClientServerConnection::ConnectServerSocket(const std::shared_ptr<IConfig> &config)
@@ -129,7 +128,7 @@ void ClientServerConnection::AcceptNew()
             oss << "start new session: " << remoteEndpoint.address().to_string();
             LoggerFactory::GetLogger()->LogInfo(oss.str().c_str());
             auto session = m_sessionCreator->CreateSession();
-            auto fut = session->Run(std::move(sock), m_clientSockets);
+            auto fut = session->Run(std::move(sock), shared_from_this());
             m_coroutineSessions.push_back(coroutine_cssession_t(session, std::move(fut)));
 
             AcceptNew();

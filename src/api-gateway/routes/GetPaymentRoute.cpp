@@ -1,34 +1,32 @@
 #include "GetPaymentRoute.h"
 
-#include <exceptions/server_exceptions.h>
 #include <exceptions/logic_exceptions.h>
+#include <exceptions/server_exceptions.h>
 #include <logger/LoggerFactory.h>
 
 #include "clients.h"
 
-void GetPaymentRoute::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t> clients)
+void GetPaymentRoute::Init(const IRequestHandlerContextPtr &context)
 {
     m_context = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     if (!m_context)
         throw ContextPtrCastException("get car route");
-
-    m_clientsIndexes = clients;
 }
 
 void GetPaymentRoute::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void GetPaymentRoute::ProcessRequest(const IRequestPtr &request, size_t &clientIndex)
+void GetPaymentRoute::ProcessRequest(const IRequestPtr &request, std::string &clientName)
 {
-    clientIndex = m_clientsIndexes[PAYMENTS_CLIENT];
+    clientName = PAYMENTS_CLIENT;
 
     std::string paymentUid;
     if (m_context->GetRequestType() == ApiGatewayContext::GetRent)
         paymentUid = m_context->GetProcessInfo().getRentRequest.rent.paymentUid;
     else if (m_context->GetRequestType() == ApiGatewayContext::GetRents)
         paymentUid = m_context->GetProcessInfo().getRentsRequest.rents[m_iteration].paymentUid;
-    
+
     if (paymentUid.empty())
         throw UndefinedPaymentUidException("get payment route");
 

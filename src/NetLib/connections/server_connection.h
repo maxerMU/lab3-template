@@ -8,11 +8,13 @@
 #include <string>
 #include <vector>
 
-#include <network/IConnection.h>
+#include <network/IServerConnection.h>
 
 using coroutine_session_t = std::pair<std::shared_ptr<IServerSession>, std::future<void>>;
 
-class ServerConnection : public IConnection, public std::enable_shared_from_this<ServerConnection>
+class ServerConnection 
+    : public IServerConnection
+    , public std::enable_shared_from_this<ServerConnection>
 {
 public:
     ServerConnection(asio::io_context &context, const std::shared_ptr<IServerSessionCreator> &creator,

@@ -2,30 +2,28 @@
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 
-#include <exceptions/server_exceptions.h>
 #include <exceptions/logic_exceptions.h>
+#include <exceptions/server_exceptions.h>
 #include <logger/LoggerFactory.h>
 
 #include "dto/PostPaymentDTO.h"
 
 #include "clients.h"
 
-void PostPaymentRoute::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t> clients)
+void PostPaymentRoute::Init(const IRequestHandlerContextPtr &context)
 {
     m_context = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     if (!m_context)
         throw ContextPtrCastException("post payment route");
-
-    m_clientsIndexes = clients;
 }
 
 void PostPaymentRoute::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void PostPaymentRoute::ProcessRequest(const IRequestPtr &request, size_t &clientIndex)
+void PostPaymentRoute::ProcessRequest(const IRequestPtr &request, std::string &clientName)
 {
-    clientIndex = m_clientsIndexes[PAYMENTS_CLIENT];
+    clientName = PAYMENTS_CLIENT;
 
     size_t price = CalculatePrice();
 
@@ -65,6 +63,6 @@ size_t PostPaymentRoute::CalculatePrice()
     int days = (dateEnd - dateStart).days();
     if (days <= 0)
         throw IncorrectDatesException("days diff less than zero");
-    
+
     return pricePerDay * days;
 }

@@ -6,22 +6,20 @@
 
 #include "clients.h"
 
-void GetCarRoute::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t> clients)
+void GetCarRoute::Init(const IRequestHandlerContextPtr &context)
 {
     m_context = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     if (!m_context)
         throw ContextPtrCastException("get car route");
-
-    m_clientsIndexes = clients;
 }
 
 void GetCarRoute::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void GetCarRoute::ProcessRequest(const IRequestPtr &request, size_t &clientIndex)
+void GetCarRoute::ProcessRequest(const IRequestPtr &request, std::string &clientName)
 {
-    clientIndex = m_clientsIndexes[CARS_CLIENT];
+    clientName = CARS_CLIENT;
 
     std::string carUid;
     if (m_context->GetRequestType() == ApiGatewayContext::GetRent)

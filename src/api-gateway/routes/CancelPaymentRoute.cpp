@@ -2,28 +2,26 @@
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 
-#include <exceptions/server_exceptions.h>
 #include <exceptions/logic_exceptions.h>
+#include <exceptions/server_exceptions.h>
 #include <logger/LoggerFactory.h>
 
 #include "clients.h"
 
-void CancelPaymentRoute::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t> clients)
+void CancelPaymentRoute::Init(const IRequestHandlerContextPtr &context)
 {
     m_context = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     if (!m_context)
         throw ContextPtrCastException("cancel payment route");
-
-    m_clientsIndexes = clients;
 }
 
 void CancelPaymentRoute::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void CancelPaymentRoute::ProcessRequest(const IRequestPtr &request, size_t &clientIndex)
+void CancelPaymentRoute::ProcessRequest(const IRequestPtr &request, std::string &clientName)
 {
-    clientIndex = m_clientsIndexes[PAYMENTS_CLIENT];
+    clientName = PAYMENTS_CLIENT;
 
     std::string paymentUid;
     if (m_context->GetRequestType() == ApiGatewayContext::CancelRent)

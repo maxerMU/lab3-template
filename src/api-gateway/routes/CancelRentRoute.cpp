@@ -5,22 +5,20 @@
 
 #include "clients.h"
 
-void CancelRentRoute::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t> clients)
+void CancelRentRoute::Init(const IRequestHandlerContextPtr &context)
 {
     m_context = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     if (!m_context)
         throw ContextPtrCastException("cancel rent route");
-
-    m_clientsIndexes = clients;
 }
 
 void CancelRentRoute::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void CancelRentRoute::ProcessRequest(const IRequestPtr &request, size_t &clientIndex)
+void CancelRentRoute::ProcessRequest(const IRequestPtr &request, std::string& clientName)
 {
-    clientIndex = m_clientsIndexes[RENTS_CLIENT];
+    clientName = RENTS_CLIENT;
 
     std::string rentUid;
     if (m_context->GetRequestType() == ApiGatewayContext::CancelRent)

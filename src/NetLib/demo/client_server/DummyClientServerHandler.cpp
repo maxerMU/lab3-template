@@ -27,15 +27,15 @@ IClientServerReqHandler::state_t DummyClientServerHandler::HandleRequest(const s
     return RES_CONTINUE;
 }
 
-IClientServerReqHandler::state_t DummyClientServerHandler::GetNextRequest(IRequestPtr &request, size_t &clientIndex)
+IClientServerReqHandler::state_t DummyClientServerHandler::GetNextRequest(IRequestPtr &request, std::string &clientName)
 {
     if (m_currentRoute >= m_routes.size())
         return RES_END;
     
-    m_routes[m_currentRoute]->Init(m_context, m_clientIndexes);
+    m_routes[m_currentRoute]->Init(m_context);
     try
     {
-        m_routes[m_currentRoute]->ProcessRequest(request, clientIndex);
+        m_routes[m_currentRoute]->ProcessRequest(request, clientName);
 
     } catch (std::exception &ex)
     {

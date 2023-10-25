@@ -17,12 +17,12 @@ IServerSessionCreatorPtr CreateServerSessionCreator(const IServerReqHandlerCreat
     return std::make_shared<HttpServerSessionCreator>(handlerCreator);
 }
 
-IClientServerSessionCreatorPtr CreateClientServerSessionCreator(const IClientServerReqHandlerCreatorPtr &handlerCreator)
+IClientServerSessionCreatorPtr CreateClientServerSessionCreator(const IClientServerReqHandlerCreatorPtr &handlerCreator, const IConfigPtr &config)
 {
-    return std::make_shared<HttpClientServerSessionCreator>(handlerCreator);
+    return std::make_shared<HttpClientServerSessionCreator>(handlerCreator, config);
 }
 
-IConnectionPtr CreateClientServerConnection(asio::io_context &context,
+IClientServerConnectionPtr CreateClientServerConnection(asio::io_context &context,
                                             const IClientServerSessionCreatorPtr &sessionCreator,
                                             const IConfigPtr &config)
 {
@@ -34,7 +34,7 @@ IRequestHandlerContextPtr CreateRequestsHandlerContext()
     return std::make_shared<RequestsHandlerContext>();
 }
 
-IConnectionPtr CreateServerConnection(asio::io_context &context, const IServerSessionCreatorPtr &creator,
+IServerConnectionPtr CreateServerConnection(asio::io_context &context, const IServerSessionCreatorPtr &creator,
                                       const IConfigPtr &config)
 {
     return std::make_shared<ServerConnection>(context, creator, config);

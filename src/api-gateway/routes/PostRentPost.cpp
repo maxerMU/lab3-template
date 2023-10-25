@@ -5,7 +5,7 @@
 #include "context/ApiGatewayContext.h"
 #include "dto/PostRentResultDTO.h"
 
-void PostRentPost::Init(const IRequestHandlerContextPtr &context, const std::map<std::string, size_t>)
+void PostRentPost::Init(const IRequestHandlerContextPtr &context)
 {
     ApiGatewayContextPtr apiGatewayContext = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     ApiGatewayContext::RequestProcessInfo::PostRentRequest rent = apiGatewayContext->GetProcessInfo().postRentRequest;
@@ -17,10 +17,10 @@ void PostRentPost::Init(const IRequestHandlerContextPtr &context, const std::map
         rent.rent.dateFrom,
         rent.rent.dateTo,
         {
-            rent.payment.paymentUid,
-            rent.payment.status,
-            rent.payment.price,
-        }
+                      rent.payment.paymentUid,
+                      rent.payment.status,
+                      rent.payment.price,
+                      }
     };
 
     apiGatewayContext->GetCurrentResponse()->SetBody(postRentDto.ToJSON());
@@ -31,7 +31,7 @@ void PostRentPost::SetRequestParameters(const std::vector<std::string> &)
 {
 }
 
-void PostRentPost::ProcessRequest(const IRequestPtr &, size_t &)
+void PostRentPost::ProcessRequest(const IRequestPtr &, std::string &)
 {
     LoggerFactory::GetLogger()->LogError("GetRentPost::ProcessRequest unexpected call");
 }
