@@ -1,0 +1,11 @@
+Server:
+        Port: 8050
+
+DB_Payments:
+        DB_NAME: "payments"
+        DB_USER: "postgres"
+        DB_USER_PASSWORD: "postgres"
+        DB_HOST: "postgres"
+        DB_PORT: 5432
+
+LogFile: "stdout"

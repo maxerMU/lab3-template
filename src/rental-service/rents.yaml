@@ -1,0 +1,11 @@
+Server:
+        Port: 8060
+
+DB_Rents:
+        DB_NAME: "rentals"
+        DB_USER: "postgres"
+        DB_USER_PASSWORD: "postgres"
+        DB_HOST: "postgres"
+        DB_PORT: 5432
+
+LogFile: "stdout"

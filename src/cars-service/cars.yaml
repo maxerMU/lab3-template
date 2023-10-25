@@ -1,0 +1,11 @@
+Server:
+        Port: 8070
+
+DB_CARS:
+        DB_NAME: "cars"
+        DB_USER: "postgres"
+        DB_USER_PASSWORD: "postgres"
+        DB_HOST: "postgres"
+        DB_PORT: 5432
+
+LogFile: "stdout"

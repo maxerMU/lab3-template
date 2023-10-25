@@ -1,0 +1,33 @@
+Clients:
+        - Cars
+        - Rents
+        - Payments
+
+# Cars:
+#         Host: "cars-service"
+#         Port: 8070
+# 
+# Rents:
+#         Host: "rental-service"
+#         Port: 8060
+# 
+# Payments:
+#         Host: "payments-service"
+#         Port: 8050
+
+Cars:
+        Host: "cars-service.onrender.com"
+        Port: 443
+
+Rents:
+        Host: "rental-service-zych.onrender.com"
+        Port: 443
+
+Payments:
+        Host: "payment-service-m2fp.onrender.com"
+        Port: 443
+
+Server:
+        Port: 8080
+
+LogFile: "stdout"

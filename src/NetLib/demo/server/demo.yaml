@@ -1,0 +1,6 @@
+Server:
+        Port: 8002
+
+AppendString: "dummy1"
+
+LogFile: "stdout"
