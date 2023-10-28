@@ -23,6 +23,8 @@ public:
 protected:
     void Fail(const error_code &ec, const std::string &desc);
 
+    asio::io_context &m_context;
+
 private:
     void ConnectServerSocket(const std::shared_ptr<IConfig> &config);
     void AcceptNew();
@@ -32,7 +34,6 @@ private:
     std::mutex m_coroutineSessionsEraseMutex;
     std::shared_ptr<IClientServerSessionCreator> m_sessionCreator;
     tcp::acceptor m_acceptor;
-    asio::io_context &m_context;
     std::shared_ptr<IConfig> m_config;
 };
 

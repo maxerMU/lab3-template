@@ -19,4 +19,5 @@ IServerConnectionPtr CreateServerConnection(asio::io_context &context, const std
 
 IClientServerSessionCreatorPtr CreateClientServerSessionCreator(const IClientServerReqHandlerCreatorPtr &handlerCreator, const IConfigPtr &config);
 IClientServerConnectionPtr CreateClientServerConnection(asio::io_context &context, const IClientServerSessionCreatorPtr& sessionCreator, const IConfigPtr& config);
+IClientServerConnectionPtr CreateCircuitBreakerClientServerConnection(asio::io_context &context, const IClientServerSessionCreatorPtr& sessionCreator, const IConfigPtr& config);
 IRequestHandlerContextPtr CreateRequestsHandlerContext();

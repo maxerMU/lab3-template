@@ -3,6 +3,7 @@
 #include "base/BeastResponseFactory.h"
 #include "connections/server_connection.h"
 #include "connections/client_server_connection.h"
+#include "connections/CircuitBreakerConnection.h"
 #include "sessions/http_session.h"
 #include "sessions/http_client_server_session.h"
 #include "router/RequestHandlerContext.h"
@@ -27,6 +28,11 @@ IClientServerConnectionPtr CreateClientServerConnection(asio::io_context &contex
                                             const IConfigPtr &config)
 {
     return std::make_shared<ClientServerConnection>(context, sessionCreator, config);
+}
+
+IClientServerConnectionPtr CreateCircuitBreakerClientServerConnection(asio::io_context &context, const IClientServerSessionCreatorPtr &sessionCreator, const IConfigPtr &config)
+{
+    return std::make_shared<CircuitBreakerConnection>(context, sessionCreator, config);
 }
 
 IRequestHandlerContextPtr CreateRequestsHandlerContext()

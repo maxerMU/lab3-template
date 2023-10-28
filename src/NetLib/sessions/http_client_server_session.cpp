@@ -50,7 +50,17 @@ std::future<void> HttpClientServerSession::Run(tcp::socket server_sock, const IC
 
             auto beast_req = MakeBeastReq(server_req);
             LoggerFactory::GetLogger()->LogInfo((std::string("next client: ") + nextClient).c_str());
-            auto clientSock = connectionCopy->ConnetClientSocket(nextClient.c_str());
+
+            std::shared_ptr<tcp::socket> clientSock;
+            try
+            {
+                clientSock = connectionCopy->ConnetClientSocket(nextClient.c_str());
+            }
+            catch (ServerException &)
+            {
+                state = handler_->ProcessError();
+                continue;
+            }
             // std::cout << "is connected: "
             // << clients_sock[next_client]->is_open() << std::endl;
             // std::cout << req_ptr->GetBody() << std::endl;

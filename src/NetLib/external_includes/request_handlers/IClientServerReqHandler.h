@@ -25,6 +25,7 @@ public:
     virtual state_t GetNextRequest(std::shared_ptr<IRequest> &req, std::string &clientName) = 0;
     virtual state_t HandleResponse(const std::shared_ptr<IResponse> &resp) = 0;
     virtual void MakeResponse(const std::shared_ptr<IResponse> &resp) = 0;
+    virtual state_t ProcessError() = 0;
 };
 
 using IClientServerReqHandlerPtr = std::shared_ptr<IClientServerReqHandler>;

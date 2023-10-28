@@ -32,6 +32,14 @@ IClientServerReqHandler::state_t ApiGatewayHandler::HandleRequest(const std::sha
     return RES_CONTINUE;
 }
 
+IClientServerReqHandler::state_t ApiGatewayHandler::ProcessError()
+{
+    LoggerFactory::GetLogger()->LogError("api gateway processing error: ");
+    m_context->GetCurrentResponse()->SetBody("Error");
+    m_context->GetCurrentResponse()->SetStatus(net::CODE_503);
+    return RES_END;
+}
+
 IClientServerReqHandler::state_t ApiGatewayHandler::GetNextRequest(IRequestPtr &request, std::string& clientName)
 {
     if (m_currentRoute >= m_routes.size())

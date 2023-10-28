@@ -17,6 +17,8 @@ target_sources( ${PROJECT_NAME} PRIVATE
     base/BeastResponseFactory.cpp
     base/BeastResponseFactory.h
 
+    connections/CircuitBreakerConnection.h
+    connections/CircuitBreakerConnection.cpp
     connections/client_server_connection.cpp
     connections/client_server_connection.h
     connections/server_connection.cpp

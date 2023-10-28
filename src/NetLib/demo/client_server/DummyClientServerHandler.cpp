@@ -27,6 +27,11 @@ IClientServerReqHandler::state_t DummyClientServerHandler::HandleRequest(const s
     return RES_CONTINUE;
 }
 
+IClientServerReqHandler::state_t DummyClientServerHandler::ProcessError()
+{
+    return RES_END;
+}
+
 IClientServerReqHandler::state_t DummyClientServerHandler::GetNextRequest(IRequestPtr &request, std::string &clientName)
 {
     if (m_currentRoute >= m_routes.size())

@@ -13,6 +13,7 @@ public:
     virtual state_t GetNextRequest(std::shared_ptr<IRequest> &req, std::string& clientName) override;
     virtual state_t HandleResponse(const std::shared_ptr<IResponse> &resp) override;
     virtual void MakeResponse(const std::shared_ptr<IResponse> &resp) override;
+    virtual state_t ProcessError() override;
 
 private:
     IConfigPtr m_config;

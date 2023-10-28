@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
     auto handlerCreator = std::make_shared<ClientServerReqHandlerCreator<ApiGatewayHandler>>(config);
     auto sessionCreator = CreateClientServerSessionCreator(handlerCreator, config);
-    auto connection = CreateClientServerConnection(ioc, sessionCreator, config);
+    auto connection = CreateCircuitBreakerClientServerConnection(ioc, sessionCreator, config);
 
     connection->Run();
 

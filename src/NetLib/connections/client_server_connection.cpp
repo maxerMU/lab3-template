@@ -11,7 +11,7 @@
 ClientServerConnection::ClientServerConnection(asio::io_context &context,
                                                const std::shared_ptr<IClientServerSessionCreator> &creator,
                                                const std::shared_ptr<IConfig> &config)
-    : m_sessionCreator(creator), m_acceptor(context), m_context(context), m_config(config)
+    : m_context(context), m_sessionCreator(creator), m_acceptor(context), m_config(config)
 {
     ConnectServerSocket(config);
 }
@@ -35,7 +35,18 @@ std::shared_ptr<tcp::socket> ClientServerConnection::ConnetClientSocket(const st
     auto results = resolver.resolve(host, std::to_string(port));
 
     std::shared_ptr<tcp::socket> clientSock(new tcp::socket(m_context));
-    asio::connect(*clientSock, results.begin(), results.end());
+    try
+    {
+        asio::connect(*clientSock, results.begin(), results.end());
+    }
+    catch (...)
+    {
+        oss.clear();
+        oss << "Can't connect to " << clientName << ": " << host << ":" << port;
+        LoggerFactory::GetLogger()->LogError(oss.str().c_str());
+
+        throw ClientNotConnectedException(oss.str().c_str());
+    }
 
     oss.clear();
     oss << "Connected to " << clientName;
