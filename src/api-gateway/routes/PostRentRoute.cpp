@@ -42,16 +42,45 @@ void PostRentRoute::ProcessRequest(const IRequestPtr &request, std::string &clie
     request->SetTarget(RENT_BASE_TARGET);
 }
 
+bool PostRentRoute::Rollback(const IRequestPtr &request, std::string &clientName)
+{
+    LoggerFactory::GetLogger()->LogInfo("ROLLBACK Post Rent");
+
+    if (m_postedRentUid.empty())
+    {
+        LoggerFactory::GetLogger()->LogWarning("postedRentUid is empty");
+        return false;
+    }
+
+    clientName = RENTS_CLIENT;
+
+    request->SetMethod(net::DELETE);
+    request->SetHeaders(m_context->GetCurrentRequest()->GetHeaders());
+    request->SetTarget(std::string(RENT_BASE_TARGET) + "/" + m_postedRentUid);
+
+    return true;
+}
+
 IClientServerRoute::ResponceType PostRentRoute::ProcessResponse(const IResponsePtr &responseFromClient)
 {
     RentDTO rent;
     rent.FromJSON(responseFromClient->GetBody());
+
+    m_postedRentUid = rent.rentUid;
 
     if (m_context->GetRequestType() == ApiGatewayContext::PostRent)
     {
         m_context->GetProcessInfo().postRentRequest.rent = rent;
         return IClientServerRoute::END_ROUTE;
     }
+
+    return IClientServerRoute::END_ROUTE;
+}
+
+IClientServerRoute::ResponceType PostRentRoute::ProcessRollbackResponse(const IResponsePtr &responseFromClient)
+{
+    if (responseFromClient->GetStatus() >= net::CODE_400)
+        LoggerFactory::GetLogger()->LogError((std::string("Failed rollback post rent: ") + m_postedRentUid).c_str());
 
     return IClientServerRoute::END_ROUTE;
 }

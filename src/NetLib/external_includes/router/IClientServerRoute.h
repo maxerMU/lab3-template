@@ -11,6 +11,7 @@ public:
     virtual void Init(const IRequestHandlerContextPtr& context) = 0;
     virtual void SetRequestParameters(const std::vector<std::string>& params) = 0;
     virtual void ProcessRequest(const IRequestPtr& request, std::string& clientName) = 0;
+    virtual bool Rollback(const IRequestPtr&, std::string&) { return false; };
 
     enum ResponceType
     {
@@ -18,6 +19,7 @@ public:
         REPEAT_ROUTE
     };
     virtual ResponceType ProcessResponse(const IResponsePtr& responseFromClient) = 0;
+    virtual ResponceType ProcessRollbackResponse(const IResponsePtr&) { return END_ROUTE; }
 
     enum RouteType
     {

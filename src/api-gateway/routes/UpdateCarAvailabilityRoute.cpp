@@ -43,11 +43,32 @@ void UpdateCarAvailabilityRoute::ProcessRequest(const IRequestPtr &request, std:
     if (carUid.empty())
         throw UndefinedCarUidException("get car route");
 
-    CarAvailabilityDTO car{carUid, available};
+    m_postedCar.carUid = carUid;
+    m_postedCar.available = available;
 
     request->SetMethod(net::PATCH);
-    request->SetBody(car.ToJSON());
+    request->SetBody(m_postedCar.ToJSON());
     request->SetTarget(GET_CAR_BASE_TARGET);
+}
+
+bool UpdateCarAvailabilityRoute::Rollback(const IRequestPtr &request, std::string &clientName)
+{
+    LoggerFactory::GetLogger()->LogInfo("ROLLBACK Update Car Availability");
+
+    if (!m_isPostSuccessfull)
+    {
+        LoggerFactory::GetLogger()->LogWarning("update car available wasn't successfull");
+        return false;
+    }
+
+    clientName = CARS_CLIENT;
+    m_postedCar.available = !m_postedCar.available;
+
+    request->SetMethod(net::PATCH);
+    request->SetBody(m_postedCar.ToJSON());
+    request->SetTarget(GET_CAR_BASE_TARGET);
+
+    return true;
 }
 
 IClientServerRoute::ResponceType UpdateCarAvailabilityRoute::ProcessResponse(const IResponsePtr &responseFromClient)
@@ -63,6 +84,18 @@ IClientServerRoute::ResponceType UpdateCarAvailabilityRoute::ProcessResponse(con
         m_context->GetCurrentResponse()->copy(responseFromClient);
         throw ProcessingResponseException("get car route invalid code");
     }
+
+    m_isPostSuccessfull = true;
+
+    return IClientServerRoute::END_ROUTE;
+}
+
+IClientServerRoute::ResponceType UpdateCarAvailabilityRoute::ProcessRollbackResponse(
+    const IResponsePtr &responseFromClient)
+{
+    if (responseFromClient->GetStatus() >= net::CODE_400)
+        LoggerFactory::GetLogger()->LogError(
+            (std::string("Failed rollback update car available: ") + m_postedCar.carUid).c_str());
 
     return IClientServerRoute::END_ROUTE;
 }

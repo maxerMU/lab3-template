@@ -37,25 +37,45 @@ IClientServerReqHandler::state_t ApiGatewayHandler::ProcessError()
     LoggerFactory::GetLogger()->LogError("api gateway processing error: ");
     m_context->GetCurrentResponse()->SetBody("Error");
     m_context->GetCurrentResponse()->SetStatus(net::CODE_503);
-    return RES_END;
+
+    m_isRollback = true;
+    LoggerFactory::GetLogger()->LogInfo("making rollback");
+
+    return RES_CONTINUE;
 }
 
 IClientServerReqHandler::state_t ApiGatewayHandler::GetNextRequest(IRequestPtr &request, std::string& clientName)
 {
-    if (m_currentRoute >= m_routes.size())
+    if (m_currentRoute >= (long) m_routes.size())
         return RES_END;
 
     try
     {
-        if (m_routes[m_currentRoute]->GetRouteType() == IClientServerRoute::REQUEST_PREPARE)
-            m_routes[m_currentRoute++]->Init(m_context);
+        if (!m_isRollback)
+        {
+            if (m_routes[m_currentRoute]->GetRouteType() == IClientServerRoute::REQUEST_PREPARE)
+                m_routes[m_currentRoute++]->Init(m_context);
 
-        m_routes[m_currentRoute]->Init(m_context);
-        
-        if (m_routes[m_currentRoute]->GetRouteType() == IClientServerRoute::RESPONSE_MAKER)
-            return RES_END;
+            m_routes[m_currentRoute]->Init(m_context);
 
-        m_routes[m_currentRoute]->ProcessRequest(request, clientName);
+            if (m_routes[m_currentRoute]->GetRouteType() == IClientServerRoute::RESPONSE_MAKER)
+                return RES_END;
+
+            m_routes[m_currentRoute]->ProcessRequest(request, clientName);
+        }
+        else
+        {
+            bool needRollback = false; 
+            needRollback = m_routes[m_currentRoute]->Rollback(request, clientName);
+            while (!needRollback && m_currentRoute > 0)
+            {
+                m_currentRoute--;
+                needRollback = m_routes[m_currentRoute]->Rollback(request, clientName);
+            }
+
+            if (!needRollback)
+                return RES_END;
+        }
     }
     catch (std::exception &ex)
     {
@@ -72,10 +92,15 @@ IClientServerReqHandler::state_t ApiGatewayHandler::HandleResponse(const IRespon
 {
     try
     {
-        IClientServerRoute::ResponceType respType = m_routes[m_currentRoute]->ProcessResponse(response);
+        IClientServerRoute::ResponceType respType;
+        if (m_isRollback)
+            respType = m_routes[m_currentRoute]->ProcessRollbackResponse(response);
+        else
+            respType = m_routes[m_currentRoute]->ProcessResponse(response);
         if (respType == IClientServerRoute::END_ROUTE)
-            m_currentRoute++;
-
+        {
+            m_isRollback ? m_currentRoute-- : m_currentRoute++;
+        }
     }
     catch (std::exception &ex)
     {
@@ -84,10 +109,11 @@ IClientServerReqHandler::state_t ApiGatewayHandler::HandleResponse(const IRespon
         m_context->GetCurrentResponse()->SetStatus(net::CODE_503);
         return RES_END;
     }
-    if (m_context->GetCurrentResponse()->GetStatus() != net::CODE_200)
-        return RES_END;
 
-    if (m_currentRoute == m_routes.size())
+    if (m_context->GetCurrentResponse()->GetStatus() >= net::CODE_400)
+        m_isRollback = true;
+
+    if (m_currentRoute >= (long) m_routes.size() || m_currentRoute < 0)
         return RES_END;
 
     return RES_CONTINUE;

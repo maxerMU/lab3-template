@@ -27,7 +27,7 @@ enum method_t
     UNDEFINED
 };
 
-enum http_code_t
+enum http_code_t : int
 {
     CODE_200 = 200, // OK
     CODE_201 = 201, // Created

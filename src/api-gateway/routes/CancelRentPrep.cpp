@@ -23,6 +23,11 @@ void CancelRentPrep::ProcessRequest(const IRequestPtr &, std::string &)
     LoggerFactory::GetLogger()->LogError("CancelRentPrep::ProcessRequest unexpected call");
 }
 
+bool CancelRentPrep::Rollback(const IRequestPtr &request, std::string &clientName)
+{
+    return false;
+}
+
 IClientServerRoute::ResponceType CancelRentPrep::ProcessResponse(const IResponsePtr &)
 {
     LoggerFactory::GetLogger()->LogError("CancelRentPrep::ProcessResponse unexpected call");

@@ -19,6 +19,7 @@ private:
     IConfigPtr m_config;
     IRequestHandlerContextPtr m_context;
 
-    size_t m_currentRoute;
+    bool m_isRollback = false;
+    long m_currentRoute;
     std::vector<IClientServerRoutePtr> m_routes;
 };

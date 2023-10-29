@@ -29,7 +29,25 @@ void PostPaymentRoute::ProcessRequest(const IRequestPtr &request, std::string &c
 
     request->SetMethod(net::POST);
     request->SetBody(PostPaymentDTO{price}.ToJSON());
-    request->SetTarget(GET_PAYMENT_BASE_TARGET);
+    request->SetTarget(PAYMENT_BASE_TARGET);
+}
+
+bool PostPaymentRoute::Rollback(const IRequestPtr &request, std::string &clientName)
+{
+    LoggerFactory::GetLogger()->LogInfo("ROLLBACK Post Payment");
+
+    if (m_postedPaymentUid.empty())
+    {
+        LoggerFactory::GetLogger()->LogWarning("postedPaymentUid is empty");
+        return false;
+    }
+
+    clientName = PAYMENTS_CLIENT;
+
+    request->SetMethod(net::DELETE);
+    request->SetTarget(std::string(PAYMENT_BASE_TARGET) + "/" + m_postedPaymentUid);
+
+    return true;
 }
 
 IClientServerRoute::ResponceType PostPaymentRoute::ProcessResponse(const IResponsePtr &responseFromClient)
@@ -37,11 +55,21 @@ IClientServerRoute::ResponceType PostPaymentRoute::ProcessResponse(const IRespon
     PaymentDTO payment;
     payment.FromJSON(responseFromClient->GetBody());
 
+    m_postedPaymentUid = payment.paymentUid;
+
     if (m_context->GetRequestType() == ApiGatewayContext::PostRent)
     {
         m_context->GetProcessInfo().postRentRequest.payment = payment;
         return IClientServerRoute::END_ROUTE;
     }
+
+    return IClientServerRoute::END_ROUTE;
+}
+
+IClientServerRoute::ResponceType PostPaymentRoute::ProcessRollbackResponse(const IResponsePtr &responseFromClient)
+{
+    if (responseFromClient->GetStatus() >= net::CODE_400)
+        LoggerFactory::GetLogger()->LogError((std::string("Failed rollback post payment: ") + m_postedPaymentUid).c_str());
 
     return IClientServerRoute::END_ROUTE;
 }
