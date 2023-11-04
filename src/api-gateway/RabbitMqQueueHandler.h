@@ -28,4 +28,3 @@ private:
     std::shared_ptr<AMQP::TcpConnection> m_connection;
     std::shared_ptr<AMQP::TcpChannel> m_channel;
 };
-
