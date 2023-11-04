@@ -12,6 +12,10 @@ target_sources( ${PROJECT_NAME} PRIVATE
   ApiGatewayHandler.h
   ApiGatewayHandler.cpp
 
+  IQueueHandler.h
+  RabbitMqQueueHandler.h
+  RabbitMqQueueHandler.cpp
+
   context/ApiGatewayContext.h
   context/ApiGatewayContext.cpp
 
@@ -85,5 +89,6 @@ target_link_libraries( ${PROJECT_NAME}
     PRIVATE
         base
         NetLib
+        amqpcpp
         jsoncpp_lib
 )

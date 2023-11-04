@@ -22,4 +22,12 @@ CIRCUIT_BREAKER:
         RETRY_COUNT: 3
         RECONNECT_TIMEOUT: 10
 
+Broker:
+        User: "guest"
+        Password: "guest"
+        Host: "localhost"
+        RoutingKey: "routing-key"
+
+        CancelRentQueue: "cancel-rent"
+
 LogFile: "stdout"

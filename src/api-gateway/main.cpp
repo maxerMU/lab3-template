@@ -2,10 +2,12 @@
 #include <logger/LoggerFactory.h>
 #include <network/net.h>
 #include <router/router.h>
+#include <config/base_sections.h>
 
 #include <memory>
 
 #include "ApiGatewayHandler.h"
+#include "RabbitMqQueueHandler.h"
 #include "routes/GetCarsRoute.h"
 #include "routes/GetCarRoute.h"
 #include "routes/GetPaymentRoute.h"
@@ -27,7 +29,7 @@
 #include "routes/CancelPaymentRoute.h"
 #include "routes/HealthRoute.h"
 
-void SetupRouter()
+void SetupRouter(const IConfigPtr& config, const IQueueHandlerPtr& queueHandler)
 {
     std::vector<IClientServerRouteCreatorPtr> healthRoute{
         std::make_shared<ClientServerRouteCreator<HealthRoute>>(),
@@ -77,7 +79,7 @@ void SetupRouter()
     RequestsRouter::Instanse()->AddDynamicEndpoint({std::regex("/api/v1/rental/([0-9\\-a-z]+)/finish"), net::POST}, finishRentRoute);
 
     std::vector<IClientServerRouteCreatorPtr> cancelRentRoute{
-        std::make_shared<ClientServerRouteCreator<CancelRentPrep>>(),
+        std::make_shared<ClientServerRouteCreator<CancelRentPrep>>(config, queueHandler),
         std::make_shared<ClientServerRouteCreator<GetRentRoute>>(),
         std::make_shared<ClientServerRouteCreator<UpdateCarAvailabilityRoute>>(),
         std::make_shared<ClientServerRouteCreator<CancelPaymentRoute>>(),
@@ -93,8 +95,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    SetupRouter();
-
     asio::io_context ioc;
 
     std::shared_ptr<IConfig> config = CreateYAMLConfig(std::string(argv[1]));
@@ -103,6 +103,11 @@ int main(int argc, char *argv[])
     auto handlerCreator = std::make_shared<ClientServerReqHandlerCreator<ApiGatewayHandler>>(config);
     auto sessionCreator = CreateClientServerSessionCreator(handlerCreator, config);
     auto connection = CreateCircuitBreakerClientServerConnection(ioc, sessionCreator, config);
+
+    auto cancelQueueName = config->GetStringField({BROKER_SECTION, BROKER_CANCEL_RENT_QUEUE_SECTION});
+    auto queueHander = std::make_shared<RabbitMqQueueHandler>(config, ioc, cancelQueueName);
+
+    SetupRouter(config, queueHander);
 
     connection->Run();
 

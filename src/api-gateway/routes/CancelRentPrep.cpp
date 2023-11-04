@@ -2,12 +2,30 @@
 
 #include "context/ApiGatewayContext.h"
 #include <logger/LoggerFactory.h>
+#include <config/base_sections.h>
+#include <exceptions/server_exceptions.h>
+#include <sstream>
+
+CancelRentPrep::CancelRentPrep(const IConfigPtr& config, const IQueueHandlerPtr &queueHander)
+    : m_config(config), m_queueHandler(queueHander)
+{
+}
 
 void CancelRentPrep::Init(const IRequestHandlerContextPtr &context)
 {
     ApiGatewayContextPtr apiGatewayContext = std::dynamic_pointer_cast<ApiGatewayContext>(context);
     apiGatewayContext->SetRequestType(ApiGatewayContext::CancelRent);
     apiGatewayContext->GetProcessInfo().cancelRentRequest.rentUid = m_rentUid;
+
+    m_context = apiGatewayContext;
+    headers_t headers = context->GetCurrentRequest()->GetHeaders();
+    auto it = headers.find("X-User-Name");
+    if (it == headers.end())
+    {
+        throw UsernameHeaderNotSetException("cancel rent");
+    }
+    
+    m_username = it->second;
 }
 
 void CancelRentPrep::SetRequestParameters(const std::vector<std::string> &params)
@@ -23,9 +41,35 @@ void CancelRentPrep::ProcessRequest(const IRequestPtr &, std::string &)
     LoggerFactory::GetLogger()->LogError("CancelRentPrep::ProcessRequest unexpected call");
 }
 
-bool CancelRentPrep::Rollback(const IRequestPtr &request, std::string &clientName)
+bool CancelRentPrep::Rollback(const IRequestPtr &, std::string &)
 {
-    return false;
+    LoggerFactory::GetLogger()->LogInfo("ROLLBACK Cancel Rent route");
+
+    if (m_rentUid.empty())
+    {
+        LoggerFactory::GetLogger()->LogWarning("rent uid is empty");
+        return false;
+    }
+
+    try
+    {
+        if (!m_queueHandler->Publish(m_rentUid, m_username))
+        {
+            std::ostringstream oss;
+            oss << "failed add to cancel rent queue: " << m_rentUid;
+            LoggerFactory::GetLogger()->LogError(oss.str().c_str());
+        }
+
+        m_context->GetCurrentResponse()->SetStatus(net::CODE_200);
+        m_context->GetCurrentResponse()->SetBody("");
+    }
+    catch(const std::exception& e)
+    {
+        LoggerFactory::GetLogger()->LogError((std::string("failed to push to queue cancel rental uid: ") + m_rentUid).c_str());
+        throw;
+    }
+    
+    return false; // no http request to clients
 }
 
 IClientServerRoute::ResponceType CancelRentPrep::ProcessResponse(const IResponsePtr &)

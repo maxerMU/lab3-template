@@ -10,3 +10,5 @@ PROJECT_EXCEPTION(ProcessingResponseException, ServerException, "(process respon
 PROJECT_EXCEPTION(ClientNotFoundException, ServerException, "(client not found error) ")
 PROJECT_EXCEPTION(ClientNotConnectedException, ServerException, "(client connection error) ")
 PROJECT_EXCEPTION(ClientOpenedCircuitBreakerException, ServerException, "(client circuit breaker is openned error) ")
+PROJECT_EXCEPTION(BrokerConnectionException, ServerException, "(can't connect to broker) ")
+PROJECT_EXCEPTION(UsernameHeaderNotSetException, ServerException, "(username header is not set) ")
