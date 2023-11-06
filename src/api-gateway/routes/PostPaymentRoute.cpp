@@ -32,14 +32,14 @@ void PostPaymentRoute::ProcessRequest(const IRequestPtr &request, std::string &c
     request->SetTarget(PAYMENT_BASE_TARGET);
 }
 
-bool PostPaymentRoute::Rollback(const IRequestPtr &request, std::string &clientName)
+IClientServerRoute::RollbackType PostPaymentRoute::Rollback(const IRequestPtr &request, std::string &clientName)
 {
     LoggerFactory::GetLogger()->LogInfo("ROLLBACK Post Payment");
 
     if (m_postedPaymentUid.empty())
     {
         LoggerFactory::GetLogger()->LogWarning("postedPaymentUid is empty");
-        return false;
+        return IClientServerRoute::SKIP;
     }
 
     clientName = PAYMENTS_CLIENT;
@@ -47,7 +47,7 @@ bool PostPaymentRoute::Rollback(const IRequestPtr &request, std::string &clientN
     request->SetMethod(net::DELETE);
     request->SetTarget(std::string(PAYMENT_BASE_TARGET) + "/" + m_postedPaymentUid);
 
-    return true;
+    return IClientServerRoute::NEED_REQUEST;
 }
 
 IClientServerRoute::ResponceType PostPaymentRoute::ProcessResponse(const IResponsePtr &responseFromClient)

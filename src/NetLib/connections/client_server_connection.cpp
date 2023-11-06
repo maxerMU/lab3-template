@@ -31,12 +31,12 @@ std::shared_ptr<tcp::socket> ClientServerConnection::ConnetClientSocket(const st
 
     std::string host = m_config->GetStringField({clientName, ClientHostSection});
     int port = m_config->GetIntField({clientName, ClientPortSection});
-    asio::ip::tcp::resolver resolver(m_context);
-    auto results = resolver.resolve(host, std::to_string(port));
 
     std::shared_ptr<tcp::socket> clientSock(new tcp::socket(m_context));
     try
     {
+        asio::ip::tcp::resolver resolver(m_context);
+        auto results = resolver.resolve(host, std::to_string(port));
         asio::connect(*clientSock, results.begin(), results.end());
     }
     catch (...)

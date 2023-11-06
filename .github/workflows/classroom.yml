@@ -37,10 +37,12 @@ jobs:
       - name: Run containers
         timeout-minutes: 10
         run: |
+          docker-compose up -d rabbitmq
           docker-compose up -d rental-service
           docker-compose up -d payments-service
           docker-compose up -d cars-service
           docker-compose up -d api-gateway
+          docker-compose up -d cancel-rent-broker
 
           docker-compose logs rental-service
           docker-compose logs payments-service
@@ -51,12 +53,12 @@ jobs:
           WAIT_PORTS: 8080,8070,8060,8050
 
       - name: Run API Tests
-        uses: matt-ball/newman-action@master
-        with:
-          collection: v3/postman/collection.json
-          environment: v3/postman/environment.json
-          delayRequest: 100
-          reporters: '[ "cli" ]'
+        timeout-minutes: 5
+        run: ./scripts/test-script.sh
+      #  env:
+      #    VARIANT: <variant>
+      #    SERVICE_NAME: <your service name>
+      #    PORT_NUMBER: <port number>
 
       # - uses: education/autograding@v1
       #   id: autograder

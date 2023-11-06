@@ -35,6 +35,16 @@ services:
     ports:
       - "5432:5432"
 
+  cancel-rent-broker:
+    image: cancel-rent-broker
+    container_name: cancel-rent-broker
+    restart: on-failure
+    build:
+      context: src/broker
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+
   rental-service:
     image: rental-service
     container_name: rental-service

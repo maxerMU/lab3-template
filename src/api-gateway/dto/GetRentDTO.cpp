@@ -31,12 +31,15 @@ Json::Value GetJSON(const GetRentDTO &rent)
 
     root["car"] = car;
 
-    Json::Value payment;
-    payment["paymentUid"] = rent.payment.paymentUid;
-    payment["status"] = rent.payment.status;
-    payment["price"] = (uint)rent.payment.price;
+    if (!rent.payment.paymentUid.empty())
+    {
+        Json::Value payment;
+        payment["paymentUid"] = rent.payment.paymentUid;
+        payment["status"] = rent.payment.status;
+        payment["price"] = (uint)rent.payment.price;
+        root["payment"] = payment;
+    }
 
-    root["payment"] = payment;
 
     return root;
 }

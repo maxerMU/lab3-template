@@ -41,14 +41,14 @@ void CancelRentPrep::ProcessRequest(const IRequestPtr &, std::string &)
     LoggerFactory::GetLogger()->LogError("CancelRentPrep::ProcessRequest unexpected call");
 }
 
-bool CancelRentPrep::Rollback(const IRequestPtr &, std::string &)
+IClientServerRoute::RollbackType CancelRentPrep::Rollback(const IRequestPtr &, std::string &)
 {
     LoggerFactory::GetLogger()->LogInfo("ROLLBACK Cancel Rent route");
 
     if (m_rentUid.empty())
     {
         LoggerFactory::GetLogger()->LogWarning("rent uid is empty");
-        return false;
+        return IClientServerRoute::SKIP;
     }
 
     try
@@ -60,7 +60,7 @@ bool CancelRentPrep::Rollback(const IRequestPtr &, std::string &)
             LoggerFactory::GetLogger()->LogError(oss.str().c_str());
         }
 
-        m_context->GetCurrentResponse()->SetStatus(net::CODE_200);
+        m_context->GetCurrentResponse()->SetStatus(net::CODE_204);
         m_context->GetCurrentResponse()->SetBody("");
     }
     catch(const std::exception& e)
@@ -68,8 +68,8 @@ bool CancelRentPrep::Rollback(const IRequestPtr &, std::string &)
         LoggerFactory::GetLogger()->LogError((std::string("failed to push to queue cancel rental uid: ") + m_rentUid).c_str());
         throw;
     }
-    
-    return false; // no http request to clients
+
+    return IClientServerRoute::NO_REQUEST;
 }
 
 IClientServerRoute::ResponceType CancelRentPrep::ProcessResponse(const IResponsePtr &)

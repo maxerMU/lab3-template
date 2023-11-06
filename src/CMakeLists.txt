@@ -9,6 +9,7 @@ project( DISP CXX ) #set variable BACKEND_SOURCE_DIR
 include( libs )
 
 add_subdirectory( base )
+# add_subdirectory( broker-test )
 add_subdirectory( NetLib )
 add_subdirectory(api-gateway)
 add_subdirectory(cars-service)

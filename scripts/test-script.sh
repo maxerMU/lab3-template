@@ -2,9 +2,12 @@
 
 set -e
 
-variant=${1:-${VARIANT}}
-service=${2:-${SERVICE_NAME}}
-port=${3:-${PORT_NUMBER}}
+#variant=${1:-${VARIANT}}
+#service=${2:-${SERVICE_NAME}}
+#port=${3:-${PORT_NUMBER}}
+variant=v3
+service=payments-service
+port=8050
 
 path=$(dirname "$0")
 
@@ -36,7 +39,7 @@ step() {
 
   printf "=== Step %d: %s %s ===\n" "$step" "$operation" "$service"
 
-  docker compose "$operation" "$service"
+  docker-compose "$operation" "$service"
   if [[ "$operation" == "start" ]]; then
     "$path"/wait-for.sh -t 120 "http://localhost:$port/manage/health" -- echo "Host localhost:$port is active"
   fi

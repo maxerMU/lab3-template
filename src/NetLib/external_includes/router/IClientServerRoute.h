@@ -11,7 +11,14 @@ public:
     virtual void Init(const IRequestHandlerContextPtr& context) = 0;
     virtual void SetRequestParameters(const std::vector<std::string>& params) = 0;
     virtual void ProcessRequest(const IRequestPtr& request, std::string& clientName) = 0;
-    virtual bool Rollback(const IRequestPtr&, std::string&) { return false; };
+    enum RollbackType
+    {
+        NEED_REQUEST,
+        NO_REQUEST,
+        NON_CRITICAL,
+        SKIP
+    };
+    virtual RollbackType Rollback(const IRequestPtr&, std::string&) { return SKIP; }
 
     enum ResponceType
     {

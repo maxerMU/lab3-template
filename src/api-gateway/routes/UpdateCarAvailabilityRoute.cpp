@@ -51,14 +51,14 @@ void UpdateCarAvailabilityRoute::ProcessRequest(const IRequestPtr &request, std:
     request->SetTarget(GET_CAR_BASE_TARGET);
 }
 
-bool UpdateCarAvailabilityRoute::Rollback(const IRequestPtr &request, std::string &clientName)
+IClientServerRoute::RollbackType UpdateCarAvailabilityRoute::Rollback(const IRequestPtr &request, std::string &clientName)
 {
     LoggerFactory::GetLogger()->LogInfo("ROLLBACK Update Car Availability");
 
     if (!m_isPostSuccessfull)
     {
         LoggerFactory::GetLogger()->LogWarning("update car available wasn't successfull");
-        return false;
+        return IClientServerRoute::SKIP;
     }
 
     clientName = CARS_CLIENT;
@@ -68,7 +68,7 @@ bool UpdateCarAvailabilityRoute::Rollback(const IRequestPtr &request, std::strin
     request->SetBody(m_postedCar.ToJSON());
     request->SetTarget(GET_CAR_BASE_TARGET);
 
-    return true;
+    return IClientServerRoute::NEED_REQUEST;
 }
 
 IClientServerRoute::ResponceType UpdateCarAvailabilityRoute::ProcessResponse(const IResponsePtr &responseFromClient)

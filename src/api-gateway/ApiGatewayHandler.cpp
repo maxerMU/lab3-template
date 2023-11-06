@@ -35,11 +35,29 @@ IClientServerReqHandler::state_t ApiGatewayHandler::HandleRequest(const std::sha
 IClientServerReqHandler::state_t ApiGatewayHandler::ProcessError()
 {
     LoggerFactory::GetLogger()->LogError("api gateway processing error: ");
-    m_context->GetCurrentResponse()->SetBody("Error");
-    m_context->GetCurrentResponse()->SetStatus(net::CODE_503);
+    
+    IRequestPtr tempreq = CreateRequestsHandlerContext()->GetCurrentRequest();
+    std::string tempName;
+    IClientServerRoute::RollbackType rollbackType = m_routes[m_currentRoute]->Rollback(tempreq, tempName);
 
-    m_isRollback = true;
-    LoggerFactory::GetLogger()->LogInfo("making rollback");
+    if (rollbackType == IClientServerRoute::NON_CRITICAL)
+    {
+        LoggerFactory::GetLogger()->LogInfo("non critical rollback. continue");
+        if (m_currentRoute++ >= (long) m_routes.size())
+            return RES_END;
+    }
+    else
+    {
+        m_isRollback = true;
+    // TODO
+        m_context->GetCurrentResponse()->SetBody("{\"message\": \"Payment Service unavailable\"}");
+        m_context->GetCurrentResponse()->SetStatus(net::CODE_503);
+        if (rollbackType == IClientServerRoute::NO_REQUEST)
+        {
+            m_currentRoute--;
+        }
+        LoggerFactory::GetLogger()->LogInfo("making rollback");
+    }
 
     return RES_CONTINUE;
 }
@@ -65,15 +83,14 @@ IClientServerReqHandler::state_t ApiGatewayHandler::GetNextRequest(IRequestPtr &
         }
         else
         {
-            bool needRollback = false; 
-            needRollback = m_routes[m_currentRoute]->Rollback(request, clientName);
-            while (!needRollback && m_currentRoute > 0)
+            bool needRequest = m_routes[m_currentRoute]->Rollback(request, clientName) == IClientServerRoute::NEED_REQUEST; 
+            while (!needRequest && m_currentRoute > 0)
             {
                 m_currentRoute--;
-                needRollback = m_routes[m_currentRoute]->Rollback(request, clientName);
+                needRequest = m_routes[m_currentRoute]->Rollback(request, clientName) == IClientServerRoute::NEED_REQUEST;
             }
 
-            if (!needRollback)
+            if (!needRequest)
                 return RES_END;
         }
     }

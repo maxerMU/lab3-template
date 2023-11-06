@@ -42,14 +42,14 @@ void PostRentRoute::ProcessRequest(const IRequestPtr &request, std::string &clie
     request->SetTarget(RENT_BASE_TARGET);
 }
 
-bool PostRentRoute::Rollback(const IRequestPtr &request, std::string &clientName)
+IClientServerRoute::RollbackType PostRentRoute::Rollback(const IRequestPtr &request, std::string &clientName)
 {
     LoggerFactory::GetLogger()->LogInfo("ROLLBACK Post Rent");
 
     if (m_postedRentUid.empty())
     {
         LoggerFactory::GetLogger()->LogWarning("postedRentUid is empty");
-        return false;
+        return IClientServerRoute::SKIP;
     }
 
     clientName = RENTS_CLIENT;
@@ -58,7 +58,7 @@ bool PostRentRoute::Rollback(const IRequestPtr &request, std::string &clientName
     request->SetHeaders(m_context->GetCurrentRequest()->GetHeaders());
     request->SetTarget(std::string(RENT_BASE_TARGET) + "/" + m_postedRentUid);
 
-    return true;
+    return IClientServerRoute::NEED_REQUEST;
 }
 
 IClientServerRoute::ResponceType PostRentRoute::ProcessResponse(const IResponsePtr &responseFromClient)

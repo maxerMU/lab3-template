@@ -82,8 +82,8 @@ void SetupRouter(const IConfigPtr& config, const IQueueHandlerPtr& queueHandler)
         std::make_shared<ClientServerRouteCreator<CancelRentPrep>>(config, queueHandler),
         std::make_shared<ClientServerRouteCreator<GetRentRoute>>(),
         std::make_shared<ClientServerRouteCreator<UpdateCarAvailabilityRoute>>(),
-        std::make_shared<ClientServerRouteCreator<CancelPaymentRoute>>(),
-        std::make_shared<ClientServerRouteCreator<CancelRentRoute>>()
+        std::make_shared<ClientServerRouteCreator<CancelRentRoute>>(),
+        std::make_shared<ClientServerRouteCreator<CancelPaymentRoute>>()
     };
     RequestsRouter::Instanse()->AddDynamicEndpoint({std::regex("/api/v1/rental/([0-9\\-a-z]+)"), net::DELETE}, cancelRentRoute);
 }
