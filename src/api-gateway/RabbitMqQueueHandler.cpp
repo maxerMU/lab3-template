@@ -58,7 +58,7 @@ void RabbitMqQueueHandler::Connect()
     }).onError([&](const char *msg)
     {
         std::ostringstream oss;
-        oss << m_queueName << ": failed declare queue: " << msg;
+        oss << m_queueName << ": failed declare exchange: " << msg;
         LoggerFactory::GetLogger()->LogError(oss.str().c_str());
     });
 }

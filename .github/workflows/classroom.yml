@@ -25,6 +25,8 @@ jobs:
           docker-compose build rental-service
           docker-compose build payments-service
           docker-compose build cars-service
+          docker-compose build cancel-rent-broker
+
       - name: Setup db
         run: |
           docker-compose up -d postgres
@@ -33,11 +35,16 @@ jobs:
           cd postgres
           ./30-create_test_database.sh
           cd ..
+      
+      - name: Setup broker
+        run: |
+          docker-compose up -d rabbitmq
+          sleep 5
+
 
       - name: Run containers
         timeout-minutes: 10
         run: |
-          docker-compose up -d rabbitmq
           docker-compose up -d rental-service
           docker-compose up -d payments-service
           docker-compose up -d cars-service

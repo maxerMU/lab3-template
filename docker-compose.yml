@@ -94,6 +94,7 @@ services:
       - rental-service
       - payments-service
       - cars-service
+      - rabbitmq
 
 volumes:
   db-data:
