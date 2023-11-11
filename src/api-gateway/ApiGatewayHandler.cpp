@@ -5,6 +5,7 @@
 #include <router/router.h>
 
 #include "context/ApiGatewayContext.h"
+#include "dto/ErrorMessageDTO.h"
 
 ApiGatewayHandler::ApiGatewayHandler(const IConfigPtr &config) : m_config(config)
 {
@@ -49,8 +50,10 @@ IClientServerReqHandler::state_t ApiGatewayHandler::ProcessError()
     else
     {
         m_isRollback = true;
-    // TODO
-        m_context->GetCurrentResponse()->SetBody("{\"message\": \"Payment Service unavailable\"}");
+        std::ostringstream oss;
+        oss << m_lastClientName << " Service unavailable";
+        ErrorMessageDTO errorDTO{oss.str()};
+        m_context->GetCurrentResponse()->SetBody(errorDTO.ToJSON());
         m_context->GetCurrentResponse()->SetStatus(net::CODE_503);
         if (rollbackType == IClientServerRoute::NO_REQUEST)
         {
@@ -101,6 +104,8 @@ IClientServerReqHandler::state_t ApiGatewayHandler::GetNextRequest(IRequestPtr &
         m_context->GetCurrentResponse()->SetStatus(net::CODE_503);
         return RES_END;
     }
+
+    m_lastClientName = clientName;
 
     return RES_CONTINUE;
 }

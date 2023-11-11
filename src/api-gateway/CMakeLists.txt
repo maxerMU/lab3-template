@@ -23,6 +23,8 @@ target_sources( ${PROJECT_NAME} PRIVATE
   dto/CarDTO.cpp
   dto/GetRentDTO.h
   dto/GetRentDTO.cpp
+  dto/ErrorMessageDTO.h
+  dto/ErrorMessageDTO.cpp
   dto/PaymentDTO.h
   dto/PaymentDTO.cpp
   dto/PostRentCarDTO.h

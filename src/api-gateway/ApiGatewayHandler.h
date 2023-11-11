@@ -22,4 +22,5 @@ private:
     bool m_isRollback = false;
     long m_currentRoute;
     std::vector<IClientServerRoutePtr> m_routes;
+    std::string m_lastClientName;
 };
